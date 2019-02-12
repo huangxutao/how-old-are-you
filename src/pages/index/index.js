@@ -30,11 +30,13 @@ class Index extends Component {
   componentDidHide () { }
 
   handleDate = (e) => {
-    const date = e.target.value
+    let date = e.target.value
+
+    console.log(date)
 
     this.setState({ date })
     Taro.navigateTo({
-      url: `/pages/result/index?date=${date}`
+      url: `/pages/result/index?date=${date.replace(/-/g, '/')}`
     })
   }
 

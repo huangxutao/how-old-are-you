@@ -61,7 +61,14 @@ class Result extends Component {
     Taro.showLoading({ title: 'loading', mask: true })
 
     const url = 'https://www.sojson.com/open/api/lunar/json.shtml'
-    const res = await get(url, { date })
+    const res = await get(url, { date: date.replace(/\//g, '-') })
+
+    if (res.status !== 200) {
+      Taro.showToast({
+        title: res.message,
+        icon: 'none'
+      })
+    }
 
     this.setState(res.data)
     Taro.hideLoading()
@@ -81,7 +88,7 @@ class Result extends Component {
     const currDate = filterDateNum(now)
     const { month, day } = filterDateNum(new Date(birthday))
     const nextBirthdayYear = (currDate.month > month || (currDate.month === month && currDate.day > day)) ? currDate.year + 1 : currDate.year;
-    const nextBirthday = new Date(`${nextBirthdayYear}-${month}-${day}`)
+    const nextBirthday = new Date(`${nextBirthdayYear}/${month}/${day}`)
     const nextBirthdayDays = getPassedDays(now, nextBirthday)
     const nextBirthdayData = filterDateNum(nextBirthday)
 
@@ -113,7 +120,7 @@ class Result extends Component {
             <View className='sub-info'>周岁算法：每过一个生日就长一岁。</View>
           </View>
           <View className='row'>
-            虚岁: {calculateBigAge(fullAge, year, lunarYear)}
+            虚岁: {calculateBigAge(fullAge, birthday)}
             <View className='sub-info'>虚岁算法：一出生就是一岁，然后，每过一个春节就长一岁。</View>
           </View>
           <View className='row'>

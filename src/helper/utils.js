@@ -98,11 +98,8 @@ const calculateFullAge = (birthdayDate) => {
   const nowObj = filterDateNum(now)
   const baseAge = nowObj.year - birthdayObj.year
 
-  if (birthdayObj.month < nowObj.month) {
-    return baseAge
-  }
-
-  if ((birthdayObj.month === nowObj.month) && (birthdayObj.day <= nowObj.day)) {
+  // 本年没过生日
+  if (birthdayObj.month < nowObj.month || ((birthdayObj.month === nowObj.month) && (birthdayObj.day > nowObj.day))) {
     return baseAge
   }
 
@@ -112,12 +109,25 @@ const calculateFullAge = (birthdayDate) => {
 
 /**
  * 虚岁算法：一出生就是一岁，然后，每过一个春节就长一岁。
- * @param {Date} birthdayDate
+ * @param {Date} birthday
  */
-const calculateBigAge = (fullAge, solarYear, lunarYear) => {
-  if (solarYear > lunarYear) return fullAge + 2
+const calculateBigAge = (fullAge, birthday) => {
+  if (!birthday) return '';
 
-  return fullAge + 1
+  if (typeof birthday === 'string') {
+    birthday = new Date(birthday)
+  }
+
+  const now = new Date()
+  const birthdayObj = filterDateNum(birthday)
+  const nowObj = filterDateNum(now)
+
+  // 本年没过生日
+  if (birthdayObj.month < nowObj.month || ((birthdayObj.month === nowObj.month) && (birthdayObj.day > nowObj.day))) {
+    return fullAge + 1
+  }
+
+  return fullAge + 2
 }
 
 const get = (url, data) => {
