@@ -3,7 +3,7 @@ import Taro from '@tarojs/taro'
 const filterDateNum = (date) => {
   if (!date) return {}
 
-  const cnDay = ['天', '一', '二', '三', '四', '五', '六']
+  const cnDay = ['日', '一', '二', '三', '四', '五', '六']
 
   return {
     year: date.getFullYear(),
@@ -28,21 +28,12 @@ const _daysInYear = (date = new Date()) => {
   const currDate = filterDateNum(date)
 
   for (let i = 1; i < currDate.month; i++) {
-		switch(i){
-			case 1:
-			case 3:
-			case 5:
-			case 7:
-			case 8:
-			case 10:
-			case 12:
-        count += 31
-        break;
-			case 2:
-        count += 28
-         break;
-			default: 
-        count += 30
+    if ([1, 3, 5, 7, 8, 10, 12].includes(i)) {
+      count += 31
+    } else if (i === 2) {
+      count += 28
+    } else {
+      count += 30
     }
   }
 
@@ -51,7 +42,7 @@ const _daysInYear = (date = new Date()) => {
     count += currDate.day
   }
 
-  return count
+  return count + currDate.day
 }
 
 /**
@@ -87,6 +78,7 @@ const getPassedDays = (startDate, endDate) => {
  * @param {Date} birthdayDate
  */
 const calculateFullAge = (birthdayDate) => {
+  let fullAge = 0
   if (!birthdayDate) return '';
 
   if (typeof birthdayDate === 'string') {
@@ -98,12 +90,24 @@ const calculateFullAge = (birthdayDate) => {
   const nowObj = filterDateNum(now)
   const baseAge = nowObj.year - birthdayObj.year
 
+  fullAge = baseAge
+
   // 本年没过生日
-  if (birthdayObj.month < nowObj.month || ((birthdayObj.month === nowObj.month) && (birthdayObj.day > nowObj.day))) {
-    return baseAge
+  if (birthdayObj.month > nowObj.month || ((birthdayObj.month === nowObj.month) && (birthdayObj.day > nowObj.day))) {
+    fullAge = baseAge - 1
   }
 
-  return baseAge - 1
+  if (fullAge === 0) {
+    const dayCount = getPassedDays(birthdayDate, now)
+    const weekCount = parseInt(dayCount/7)
+
+    console.log(birthdayDate, now, dayCount)
+
+
+    fullAge = weekCount > 0 ? `小宝宝满 ${weekCount} 周了` : `满 ${dayCount} 天`
+  }
+
+  return fullAge
 }
 
 
@@ -112,7 +116,11 @@ const calculateFullAge = (birthdayDate) => {
  * @param {Date} birthday
  */
 const calculateBigAge = (fullAge, birthday) => {
-  if (!birthday) return '';
+  if (!birthday) return ''
+
+  if (typeof fullAge === 'string') {
+    return fullAge
+  }
 
   if (typeof birthday === 'string') {
     birthday = new Date(birthday)
@@ -123,7 +131,7 @@ const calculateBigAge = (fullAge, birthday) => {
   const nowObj = filterDateNum(now)
 
   // 本年没过生日
-  if (birthdayObj.month < nowObj.month || ((birthdayObj.month === nowObj.month) && (birthdayObj.day > nowObj.day))) {
+  if (birthdayObj.month > nowObj.month || ((birthdayObj.month === nowObj.month) && (birthdayObj.day > nowObj.day))) {
     return fullAge + 1
   }
 
