@@ -48,16 +48,29 @@ class Index extends Component {
 
     if (userInfo) {
       if (hasStoreUserInfo) return
+
       Taro.setStorage({
         key: 'hasStoreUserInfo',
         data: true
       })
+
       postJSON('https://how-old-server.hxtao.xyz/saveUserInfo', userInfo).then(({ userInfo: { _id } }) => {
         Taro.setStorage({
           key: 'userId',
           data: _id
         })
       })
+
+      // r如果已经跳转到结果页 授权后重载
+      const pages = getCurrentPages()
+      const currPage = pages[pages.length -1]
+
+      if (currPage.route === 'pages/result/index') {
+        Taro.redirectTo({
+          url: `/pages/result/index?date=${currPage.options.date}`
+        })
+      }
+
     } else {
       Taro.showToast({
         title: '授权体后验更佳哦',
