@@ -132,10 +132,10 @@ const calculateBigAge = (fullAge, birthday) => {
 
   // 本年没过生日
   if (birthdayObj.month > nowObj.month || ((birthdayObj.month === nowObj.month) && (birthdayObj.day > nowObj.day))) {
-    return fullAge + 1
+    return fullAge + 2
   }
 
-  return fullAge + 2
+  return fullAge + 1
 }
 
 const get = (url, data) => {
