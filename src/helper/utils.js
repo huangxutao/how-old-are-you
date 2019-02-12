@@ -136,10 +136,30 @@ const get = (url, data) => {
   })
 }
 
+const postJSON = (url, data) => {
+  return new Promise((resolve, reject) => {
+    Taro.request({
+      url,
+      method: 'POST',
+      data,
+      header: {
+        'content-type': 'application/json' // 默认值
+      },
+      success: res => {
+        resolve(res.data)
+      },
+      fail: err => {
+        reject(err)
+      }
+    })
+  })
+}
+
 export {
   calculateBigAge,
   calculateFullAge,
   getPassedDays,
   filterDateNum,
-  get
+  get,
+  postJSON
 }

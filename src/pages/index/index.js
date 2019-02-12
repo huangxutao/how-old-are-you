@@ -1,5 +1,6 @@
 import Taro, { Component } from '@tarojs/taro'
 import { View, Image, Button, Text, Picker } from '@tarojs/components'
+import { postJSON } from '../../helper/utils'
 import Logo from '../../assets/images/logo2.jpeg';
 
 import './index.scss'
@@ -38,11 +39,31 @@ class Index extends Component {
   }
 
   onGetUserInfo = ({ detail: { userInfo } }) => {
-    console.log(userInfo)
+    const hasStoreUserInfo = Taro.getStorageSync('hasStoreUserInfo')
+
     Taro.setStorage({
       key: 'userInfo',
       data: userInfo
     })
+
+    if (userInfo) {
+      if (hasStoreUserInfo) return
+      Taro.setStorage({
+        key: 'hasStoreUserInfo',
+        data: true
+      })
+      postJSON('https://how-old-server.hxtao.xyz/saveUserInfo', userInfo).then(({ userInfo: { _id } }) => {
+        Taro.setStorage({
+          key: 'userId',
+          data: _id
+        })
+      })
+    } else {
+      Taro.showToast({
+        title: '授权体后验更佳哦',
+        icon: 'none'
+      })
+    }
   }
 
   render () {

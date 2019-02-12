@@ -58,15 +58,22 @@ class Result extends Component {
   }
 
   async solar2lunar (date) {
+    Taro.showLoading({ title: 'loading', mask: true })
+
     const url = 'https://www.sojson.com/open/api/lunar/json.shtml'
     const res = await get(url, { date })
 
     this.setState(res.data)
+    Taro.hideLoading()
   }
 
   renderWords (birthday, fullAge) {
     if (fullAge < 0) {
       return '瞅啥瞅，赶紧造人去吧！'
+    }
+
+    if (fullAge > 100) {
+      return `您老身体可真好 😄`
     }
 
     const now = new Date()
@@ -120,7 +127,7 @@ class Result extends Component {
           </View>
           <View className='some-words' style={{ animationDelay: '0.32s' }}>
             <View className='words-title'>
-              To: {userInfo.nickName}
+              To: {userInfo.nickName || 'you'}
             </View>
             <View className='words-content'>{this.renderWords(birthday, fullAge)}</View>
           </View>
