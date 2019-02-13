@@ -1,6 +1,6 @@
 import Taro, { Component } from '@tarojs/taro'
 import { View, Image, Button } from '@tarojs/components'
-import { calculateFullAge, calculateBigAge, getPassedDays, filterDateNum, get } from '../../helper/utils';
+import { calculateFullAge, calculateBigAge, getPassedDays, getLunarInfo, filterDateNum } from '../../helper/utils';
 import Logo from '../../assets/images/logo.jpeg'
 
 import './index.scss'
@@ -22,7 +22,6 @@ class Result extends Component {
   componentDidMount () {
     const birthday = this.$router.params.date
 
-    this.solar2lunar(birthday)
     this.setState({ birthday })
   }
 
@@ -47,31 +46,8 @@ class Result extends Component {
     }
   }
 
-  handleDate = (e) => {
-    console.log(e.target.value)
-    // this.setState({})
-  }
-
-
   handleBack = () => {
     Taro.navigateBack()
-  }
-
-  async solar2lunar (date) {
-    Taro.showLoading({ title: 'loading', mask: true })
-
-    const url = 'https://www.sojson.com/open/api/lunar/json.shtml'
-    const res = await get(url, { date: date.replace(/\//g, '-') })
-
-    if (res.status !== 200) {
-      Taro.showToast({
-        title: res.message,
-        icon: 'none'
-      })
-    }
-
-    this.setState(res.data)
-    Taro.hideLoading()
   }
 
   renderWords (birthday, fullAge) {
@@ -105,7 +81,8 @@ class Result extends Component {
 
   render () {
     const userInfo = Taro.getStorageSync('userInfo')
-    const { birthday, year, month, day, lunarYear, cnmonth, cnday, cyclicalYear, cyclicalMonth, cyclicalDay, animal } = this.state
+    const { birthday } = this.state
+    const { lYear, monthCn, dayCn, gzYear, gzMonth, gzDay, animal, cYear, cMonth, cDay } = getLunarInfo(birthday)
     const fullAge = calculateFullAge(birthday)
 
     return (
@@ -120,19 +97,19 @@ class Result extends Component {
             <View className='sub-info'>周岁算法：每过一个生日就长一岁。</View>
           </View>
           <View className='row'>
-            虚岁: {calculateBigAge(fullAge, birthday)}
+            虚岁: {calculateBigAge(birthday)}
             <View className='sub-info'>虚岁算法：一出生就是一岁，然后，每过一个春节就长一岁。</View>
           </View>
           <View className='row'>
             生肖: {animal}
           </View>
           <View className='row'>
-            公历生日: {year}年 {month}月 {day}日 
+            公历生日: {cYear}年 {cMonth}月 {cDay}日 
           </View>
           <View className='row'>
-            农历生日: {lunarYear}年 {cnmonth}月 {cnday} （{cyclicalYear}年 {cyclicalMonth}月 {cyclicalDay}日）
+            农历生日: {lYear}年 {monthCn} {dayCn} （{gzYear}年 {gzMonth}月 {gzDay}日）
           </View>
-          <View className='some-words' style={{ animationDelay: '0.32s' }}>
+          <View className='some-words'>
             <View className='words-title'>
               To: {userInfo.nickName || 'you'}
             </View>

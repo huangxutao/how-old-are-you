@@ -1,4 +1,5 @@
 import Taro from '@tarojs/taro'
+import solarlunar from 'solarlunar'
 
 const filterDateNum = (date) => {
   if (!date) return {}
@@ -110,12 +111,11 @@ const calculateFullAge = (birthdayDate) => {
   return fullAge
 }
 
-
 /**
  * 虚岁算法：一出生就是一岁，然后，每过一个春节就长一岁。
  * @param {Date} birthday
  */
-const calculateBigAge = (fullAge, birthday) => {
+const calculateBigAge_old = (fullAge, birthday) => {
   if (!birthday) return ''
 
   if (typeof fullAge === 'string') {
@@ -136,6 +136,27 @@ const calculateBigAge = (fullAge, birthday) => {
   }
 
   return fullAge + 1
+}
+
+/**
+ * 虚岁算法：一出生就是一岁，然后，每过一个春节就长一岁。
+ * @param {Date} birthday
+ */
+const calculateBigAge = (birthday) => {
+  const birthdayObj = getLunarInfo(birthday)
+  const nowObj = getLunarInfo(new Date())
+
+  return nowObj.lYear - birthdayObj.lYear + 1
+}
+
+const getLunarInfo = (solarDate) => {
+  if (typeof solarDate === 'string') {
+    solarDate = new Date(solarDate)
+  }
+
+  const { year, month, day } = filterDateNum(solarDate)
+
+  return solarlunar.solar2lunar(year, month, day)
 }
 
 const get = (url, data) => {
@@ -175,9 +196,11 @@ const postJSON = (url, data) => {
 
 export {
   calculateBigAge,
+  calculateBigAge_old,
   calculateFullAge,
   getPassedDays,
   filterDateNum,
+  getLunarInfo,
   get,
   postJSON
 }
